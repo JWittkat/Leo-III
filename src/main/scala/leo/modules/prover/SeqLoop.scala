@@ -3,6 +3,8 @@ package leo.modules.prover
 import leo.{Configuration, Out}
 import leo.datastructures._
 import leo.datastructures.TPTP.AnnotatedFormula
+import leo.modules.HOLSignature.{HOLLess, HOLProduct, HOLSum, int, o}
+import leo.modules.arithmetic.{AxiomsForArithmetic, RewritingArithmetic, SignatureArithmetic}
 import leo.modules.{SZSOutput, SZSResult, myAssert}
 import leo.modules.control.Control
 import leo.modules.input.ProblemStatistics
@@ -19,7 +21,7 @@ object SeqLoop {
   ////////////////////////////////////
   //// Preprocessing
   ////////////////////////////////////
-  protected[modules] final def preprocess(cur: AnnotatedClause)(implicit state: State[AnnotatedClause]): Set[AnnotatedClause] = {
+  protected[modules] final def preprocess(cur: AnnotatedClause)(implicit state: State[AnnotatedClause],sigArithmetic: SignatureArithmetic): Set[AnnotatedClause] = {
     implicit val sig: Signature = state.signature
     var result: Set[AnnotatedClause] = Set.empty
 
@@ -58,6 +60,7 @@ object SeqLoop {
 //    result = Control.extPreprocessUnify(result)(state)
     //result = Control.cheapSimpSet(result)
     result = result.filterNot(cw => Clause.trivial(cw.cl))
+    result = RewritingArithmetic(result)
     result
   }
 
@@ -115,6 +118,8 @@ object SeqLoop {
   final def run(input: Seq[AnnotatedClause], startTime: Long)(implicit state: State[AnnotatedClause]): Boolean = {
     try {
       implicit val sig: Signature = state.signature
+      // stuff for saving information about arithmetic operations and types
+      implicit val sigArithmetic: SignatureArithmetic = new SignatureArithmetic
       val timeout0 = state.timeout
       val timeout: Float = if (timeout0 == 0) Float.PositiveInfinity else timeout0.toFloat
       // Initialize indexes
@@ -130,12 +135,16 @@ object SeqLoop {
         input
       }
       // Pre-processing
+      sig.addUninterpreted("$$sum", HOLSum.ty)
+      sig.addUninterpreted("$$less", HOLLess.ty)
+      sig.addUninterpreted("$$product", HOLProduct.ty)
+
       val toPreprocessIt = toPreprocess.iterator
       Out.trace("## Preprocess BEGIN")
       while (toPreprocessIt.hasNext) {
         val todo = toPreprocessIt.next()
         Out.trace(s"# Process: ${todo.pretty(sig)}")
-        val result0 = preprocess(todo)(state)
+        val result0 = preprocess(todo)(state,sigArithmetic)
         Out.trace(s"# Result:\n\t${result0.map {_.pretty(sig)}.mkString("\n\t")}")
         val result = result0.filterNot(cw => Clause.trivial(cw.cl))
         myAssert(result.forall(cl => Clause.wellTyped(cl.cl)),
@@ -143,6 +152,8 @@ object SeqLoop {
         Control.addUnprocessed(result)
         if (toPreprocessIt.hasNext) Out.trace("--------------------")
       }
+      // add axioms
+      AxiomsForArithmetic()
       Out.trace("## Preprocess END")
       /////////////////////////////////////////
       // Main loop start
