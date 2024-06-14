@@ -8,7 +8,6 @@ import leo.modules.prover.State
 object CheckingArithmetic {
   final def apply(clauseSet: Set[AnnotatedClause])(implicit state: State[AnnotatedClause], sigArithmetic: SignatureArithmetic): Unit = {
     implicit val sig: Signature = state.signature
-    var result: Set[AnnotatedClause] = Set.empty
     val clauseIt = clauseSet.iterator
     while (clauseIt.hasNext) {
       val clause = clauseIt.next()
@@ -54,7 +53,6 @@ object CheckingArithmetic {
         else if (n == real) {
           sigArithmetic.foundReal()
         }
-        term
       case Symbol(n) =>
         if (n == sig("$int").key) {
           sigArithmetic.foundInt()
@@ -65,16 +63,12 @@ object CheckingArithmetic {
         else if (n == sig("$real").key) {
           sigArithmetic.foundReal()
         }
-        term
       case Integer(n) =>
         sigArithmetic.foundInt()
-        term
       case Rational(n,m) =>
         sigArithmetic.foundRat()
-        term
       case Real(n,m,d) =>
         sigArithmetic.foundReal()
-        term
       case ty :::> body => checkForArithmetic0(body)
       case TypeLambda(body) => checkForArithmetic0(body)
       case f ∙ args if args.length <= 3 =>
