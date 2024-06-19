@@ -76,44 +76,44 @@ object CheckingArithmetic {
           case Symbol(id) =>
             id match {
               case HOLSum.key =>
-                println("SUM")
+                //println("SUM")
                 sigArithmetic.foundAdd()
                 val (left, right) = HOLSum.unapply(term).get
                 checkForArithmetic0(left)
                 checkForArithmetic0(right)
               case HOLLess.key =>
                 sigArithmetic.foundOrd()
-                println("LESS")
+                //println("LESS")
                 val (left, right) = HOLLess.unapply(term).get
                 checkForArithmetic0(left)
                 checkForArithmetic0(right)
               case HOLDifference.key =>
                 sigArithmetic.foundAdd()
-                println("DIFFERENCE")
+                //println("DIFFERENCE")
                 val (left, right) = HOLDifference.unapply(term).get
                 checkForArithmetic0(left)
                 checkForArithmetic0(right)
               case HOLGreater.key =>
                 sigArithmetic.foundOrd()
-                println("GREATER")
+                //println("GREATER")
                 val (left, right) = HOLGreater.unapply(term).get
                 checkForArithmetic0(left)
                 checkForArithmetic0(right)
               case HOLGreaterEq.key =>
                 sigArithmetic.foundOrd()
-                println("GREATER EQUAL")
+                //println("GREATER EQUAL")
                 val (left,right) = HOLGreaterEq.unapply(term).get
                 checkForArithmetic0(left)
                 checkForArithmetic0(right)
               case HOLLessEq.key  =>
                 sigArithmetic.foundOrd()
-                println("LESS EQUAL")
+                //println("LESS EQUAL")
                 val (left, right) = HOLLessEq.unapply(term).get
                 checkForArithmetic0(left)
                 checkForArithmetic0(right)
               case HOLProduct.key =>
                 sigArithmetic.foundMult()
-                println("PRODUCT")
+                //println("PRODUCT")
                 val (left, right) = HOLProduct.unapply(term).get
                 checkForArithmetic0(left)
                 checkForArithmetic0(right)

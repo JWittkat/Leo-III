@@ -15,22 +15,22 @@ object ArithmeticAxioms {
     var axioms: Set[AnnotatedClause]  = Set.empty
     // check whats in there and what axioms should be added
     if(sigArithmetic.containsAdd() || sigArithmetic.containsOrd()) {
-      println("ADD AXIOMS FOR ADDITION WITHOUT REWRITING")
+      //println("ADD AXIOMS FOR ADDITION WITHOUT REWRITING")
       if (sigArithmetic.containsInt()) {
-        println("INT")
+        //println("INT")
         axioms = axioms union getAxiomsAddition(int)
       }
       if (sigArithmetic.containsRat()) {
-        println("RAT")
+        //println("RAT")
         axioms = axioms union getAxiomsAddition(rat)
       }
       if (sigArithmetic.containsReal()) {
-        println("REAL")
+        //println("REAL")
         axioms = axioms union getAxiomsAddition(real)
       }
     }
     if(sigArithmetic.containsOrd()) {
-      println("ADD AXIOMS FOR ORDERING WITHOUT REWRITING")
+      //println("ADD AXIOMS FOR ORDERING WITHOUT REWRITING")
       if (sigArithmetic.containsInt()) {
         axioms = axioms union getAxiomsOrdering(int)
       }
@@ -42,7 +42,7 @@ object ArithmeticAxioms {
       }
     }
     if(sigArithmetic.containsMult()) {
-      println("ADD AXIOMS FOR MULTIPLICATION WITHOUT REWRITING")
+      //println("ADD AXIOMS FOR MULTIPLICATION WITHOUT REWRITING")
       if(sigArithmetic.containsInt()) {
         axioms = axioms union getAxiomsMultiplication(int)
       }
@@ -196,7 +196,7 @@ object ArithmeticAxioms {
       val termLeft6 = ===(x, mkNumberOfType(ty,0))
       val innerTermLeft6 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$product").key), x.ty) ,Seq(x,y))
       val innerTermRight6 = ===(x,y)
-      val termRight6 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$quotions").key), innerTermLeft6.ty), Seq(innerTermLeft6,innerTermRight6))
+      val termRight6 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$quotient").key), innerTermLeft6.ty), Seq(innerTermLeft6,innerTermRight6))
       val term6 = mkTermApp(mkAtom(|||.key), Seq(termLeft6,termRight6))
       val newLit6 = mkLit(term6,true)
       axioms += AnnotatedClause(Clause(newLit6), Role_Axiom, FromSystem("introduced_theory",Seq.empty),ClauseAnnotation.PropNoProp)
