@@ -1,6 +1,6 @@
 package leo.modules.arithmeticWithRewriting
 import leo.datastructures.{AnnotatedClause, Clause, Literal, Signature, Term, Type}
-import leo.modules.HOLSignature.{===, HOLDifference, HOLGreater, HOLGreaterEq, HOLLess, HOLLessEq, HOLProduct, HOLSum, HOLUnaryMinus, int, rat, real, |||}
+import leo.modules.HOLSignature.{===, HOLDifference, HOLGreater, HOLGreaterEq, HOLLess, HOLLessEq, HOLProduct, HOLQuotient, HOLSum, HOLUnaryMinus, int, rat, real, |||}
 import leo.datastructures.Term._
 import leo.datastructures.Literal._
 import leo.modules.prover.State
@@ -14,7 +14,7 @@ object RewritingArithmetic {
       val clause = clauseIt.next()
       // check if there is arithmetic or ordering stuff in the clause to rename
       val keys = Clause.symbols(clause.cl)
-      if (keys.contains(HOLSum.key) || keys.contains(HOLLess.key) || keys.contains(HOLDifference.key) || keys.contains(HOLGreater.key) || keys.contains(HOLGreaterEq.key) || keys.contains(HOLLessEq.key) || keys.contains(HOLProduct.key)) {
+      if (keys.contains(HOLSum.key) || keys.contains(HOLLess.key) || keys.contains(HOLDifference.key) || keys.contains(HOLGreater.key) || keys.contains(HOLGreaterEq.key) || keys.contains(HOLLessEq.key) || keys.contains(HOLProduct.key) || keys.contains(HOLQuotient.key)) {
         println("CHANGING ARITHMETIC TO NEW FUNCTION")
         result += renameArithmetic(clause)
       }
@@ -144,7 +144,13 @@ object RewritingArithmetic {
                 val (left, right) = HOLProduct.unapply(term).get
                 val newLeft = renameArithmetic0(left)
                 val newRight = renameArithmetic0(right)
-                mkTermApp(mkTypeApp(mkAtom(sig("$$product").key), newLeft.ty), Seq(newRight,newLeft))
+                mkTermApp(mkTypeApp(mkAtom(sig("$$product").key), newLeft.ty), Seq(newLeft,newRight))
+              case HOLQuotient.key =>
+                println("RENAME QUOTIENT")
+                val (left, right) = HOLQuotient.unapply(term).get
+                val newLeft = renameArithmetic0(left)
+                val newRight = renameArithmetic0(right)
+                mkTermApp(mkTypeApp(mkAtom(sig("$$quotient").key), newLeft.ty), Seq(newLeft,newRight))
               case _ => println(s"ID: $id NOT IDENTIFIED YET :(")
                 mkApp(f, args.map(allArgs))
             }

@@ -201,12 +201,16 @@ object AxiomsForArithmetic {
     val newLit5 = mkLit(termLeft5, termRight5, true)
     axioms += AnnotatedClause(Clause(newLit5), Role_Axiom, FromSystem("introduced_theory",Seq.empty),ClauseAnnotation.PropNoProp)
     // x = 0 | (y * x) / x = y (ONLY REALS!!!!)
-    /* DIVISION??????
+    //DIVISION??????
     if (ty == real) {
-      val TermLeft6 = ===(x, mkNumberOfType(ty,0))
-      val innerTermRight6 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$$product").key), x.ty) ,Seq(x,y))
+      val termLeft6 = ===(x, mkNumberOfType(ty,0))
+      val innerTermLeft6 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$$product").key), x.ty) ,Seq(x,y))
+      val innerTermRight6 = ===(x,y)
+      val termRight6 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$$quotient").key), innerTermLeft6.ty), Seq(innerTermLeft5,innerTermRight6))
+      val term6 = mkTermApp(mkAtom(|||.key), Seq(termLeft6, termRight6))
+      val newLit6 = mkLit(term6, true)
+      axioms += AnnotatedClause(Clause(newLit6), Role_Axiom, FromSystem("introduced_theory",Seq.empty),ClauseAnnotation.PropNoProp)
     }
-    */
     axioms
   }
 }
