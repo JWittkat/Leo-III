@@ -3,9 +3,9 @@ package leo.modules.prover
 import leo.{Configuration, Out}
 import leo.datastructures._
 import leo.datastructures.TPTP.AnnotatedFormula
-import leo.modules.HOLSignature.{HOLLess, HOLProduct, HOLSum, int, o}
-//import leo.modules.arithmeticWithRewriting.{AxiomsForArithmetic, RewritingArithmetic, SignatureArithmetic}
-import leo.modules.arithmeticWithoutRewriting.{ArithmeticAxioms, CheckingArithmetic, SignatureArithmetic}
+import leo.modules.HOLSignature.{HOLLess, HOLProduct, HOLQuotient, HOLSum, int, o}
+import leo.modules.arithmeticWithRewriting.{AxiomsForArithmetic, RewritingArithmetic, SignatureArithmetic}
+//import leo.modules.arithmeticWithoutRewriting.{ArithmeticAxioms, CheckingArithmetic, SignatureArithmetic}
 import leo.modules.{SZSOutput, SZSResult, myAssert}
 import leo.modules.control.Control
 import leo.modules.input.ProblemStatistics
@@ -61,8 +61,8 @@ object SeqLoop {
 //    result = Control.extPreprocessUnify(result)(state)
     //result = Control.cheapSimpSet(result)
     result = result.filterNot(cw => Clause.trivial(cw.cl))
-    //result = RewritingArithmetic(result)
-    CheckingArithmetic(result)
+    result = RewritingArithmetic(result)
+    //CheckingArithmetic(result)
     result
   }
 
@@ -137,9 +137,10 @@ object SeqLoop {
         input
       }
       // Pre-processing
-      //sig.addUninterpreted("$$sum", HOLSum.ty)
-      //sig.addUninterpreted("$$less", HOLLess.ty)
-      //sig.addUninterpreted("$$product", HOLProduct.ty)
+      sig.addUninterpreted("$$sum", HOLSum.ty)
+      sig.addUninterpreted("$$less", HOLLess.ty)
+      sig.addUninterpreted("$$product", HOLProduct.ty)
+      sig.addUninterpreted("$$quotient", HOLQuotient.ty)
 
       val toPreprocessIt = toPreprocess.iterator
       Out.trace("## Preprocess BEGIN")
@@ -155,8 +156,10 @@ object SeqLoop {
         if (toPreprocessIt.hasNext) Out.trace("--------------------")
       }
       // add axioms
-      //AxiomsForArithmetic()
-      ArithmeticAxioms()
+      //with rewriting
+      AxiomsForArithmetic()
+      //without rewriting
+      //ArithmeticAxioms()
       Out.trace("## Preprocess END")
       /////////////////////////////////////////
       // Main loop start
