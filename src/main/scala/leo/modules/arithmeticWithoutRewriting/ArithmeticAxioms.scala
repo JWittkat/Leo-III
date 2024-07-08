@@ -54,6 +54,10 @@ object ArithmeticAxioms {
       }
     }
     Control.addUnprocessed(axioms)
+    /*
+    for (axiom <- axioms) {
+      state.addProcessed(axiom)
+    }*/
   }
 
   final def mkNumberOfType(ty: Type, number: Int): Term = {

@@ -14,7 +14,7 @@ object CheckingArithmetic {
       // check if there is arithmetic or ordering stuff in the clause to rename
       val keys = Clause.symbols(clause.cl)
       if (keys.contains(HOLSum.key) || keys.contains(HOLLess.key) || keys.contains(HOLDifference.key) || keys.contains(HOLGreater.key) || keys.contains(HOLGreaterEq.key) || keys.contains(HOLLessEq.key) || keys.contains(HOLProduct.key)) {
-        println("CHANGING ARITHMETIC TO NEW FUNCTION")
+        //println("NOT CHANGING ARITHMETIC TO NEW FUNCTION")
         checkForArithmetic(clause)
       }
     }
@@ -117,10 +117,10 @@ object CheckingArithmetic {
                 val (left, right) = HOLProduct.unapply(term).get
                 checkForArithmetic0(left)
                 checkForArithmetic0(right)
-              case _ => println(s"ID: $id NOT IDENTIFIED YET :(")
+              case _ => //println(s"ID: $id NOT IDENTIFIED YET :(")
                 args.map(allArgs)
             }
-          case _ => println("NOT A SYMBOL")
+          case _ => //println("NOT A SYMBOL")
             args.map(allArgs)
         }
       case f ∙ args =>
