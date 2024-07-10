@@ -1,5 +1,5 @@
 package leo.modules.arithmeticWithRewriting
-import leo.datastructures.{AnnotatedClause, Clause, Literal, Signature, Term, Type}
+import leo.datastructures.{AnnotatedClause, Clause, Literal, Signature, Term, Type, prettyRat, prettyReal}
 import leo.modules.HOLSignature.{===, HOLDifference, HOLGreater, HOLGreaterEq, HOLLess, HOLLessEq, HOLProduct, HOLQuotient, HOLSum, HOLUnaryMinus, int, rat, real, |||}
 import leo.datastructures.Term._
 import leo.datastructures.Literal._
@@ -82,9 +82,11 @@ object RewritingArithmetic {
         term
       case Rational(n,m) =>
         sigArithmetic.foundRat()
+        println(prettyRat(n,m))
         term
       case Real(n,m,d) =>
         sigArithmetic.foundReal()
+        println(prettyReal((n,m,d)))
         term
       case ty :::> body => mkTermAbs(ty, renameArithmetic0(body))
       case TypeLambda(body) => mkTypeAbs(renameArithmetic0(body))
