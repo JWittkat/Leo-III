@@ -189,7 +189,7 @@ object ArithmeticAxioms {
     axioms += AnnotatedClause(Clause(newLit4), Role_Axiom, FromSystem("introduced_theory",Seq.empty),ClauseAnnotation.PropNoProp)
     // axiom: (x * y) + (x * z) = x * (y + z)
     val innerTermLeft5 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$product").key), x.ty) ,Seq(x,z))
-    val termLeft5 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$product").key), termLeft3.ty) ,Seq(termLeft3, innerTermLeft5))
+    val termLeft5 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$sum").key), termLeft3.ty) ,Seq(termLeft3, innerTermLeft5))
     val innerTermRight5 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$sum").key), y.ty) ,Seq(y,z))
     val termRight5 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$product").key), x.ty) ,Seq(x,innerTermRight5))
     val newLit5 = mkLit(termLeft5, termRight5, true)
