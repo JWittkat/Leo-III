@@ -1,5 +1,6 @@
 package leo.modules.arithmeticWithoutRewriting
 
+// class to store the information about what arithmetic types and operations are present in the problem
 class SignatureArithmetic {
   private var containsInteger = false
   private var containsRational = false
@@ -7,7 +8,7 @@ class SignatureArithmetic {
   private var containsAddition = false
   private var containsOrdering = false
   private var containsMultiplication = false
-  // get values
+  // functions to get the information
   def containsInt(): Boolean = {
     containsInteger
   }
@@ -26,7 +27,7 @@ class SignatureArithmetic {
   def containsMult(): Boolean = {
     containsMultiplication
   }
-  // set values
+  // functions to set the information
   def foundInt(): Unit = {
     containsInteger = true
   }

@@ -1,6 +1,6 @@
 package leo.modules.arithmeticWithoutRewriting
-import leo.datastructures.ClauseAnnotation.{FromSystem, NoAnnotation}
-import leo.datastructures.{AnnotatedClause, Clause, ClauseAnnotation, Literal, Role_Axiom, Signature, Term, Type}
+import leo.datastructures.ClauseAnnotation.{FromSystem}
+import leo.datastructures.{AnnotatedClause, Clause, ClauseAnnotation, Role_Axiom, Signature, Term, Type}
 import leo.datastructures.Term.local._
 import leo.datastructures.Literal._
 import leo.modules.HOLSignature.{===, HOLUnaryMinus, Not, i, int, rat, real, |||}
@@ -11,26 +11,21 @@ import leo.modules.prover.State
 object ArithmeticAxioms {
   final def apply()(implicit state: State[AnnotatedClause], sigArithmetic: SignatureArithmetic): Unit = {
     implicit val sig: Signature = state.signature
-    // Set for all axioms, that should be added
+    // Set for all axioms that will be added
     var axioms: Set[AnnotatedClause]  = Set.empty
     // check whats in there and what axioms should be added
     if(sigArithmetic.containsAdd() || sigArithmetic.containsOrd()) {
-      //println("ADD AXIOMS FOR ADDITION WITHOUT REWRITING")
       if (sigArithmetic.containsInt()) {
-        //println("INT")
         axioms = axioms union getAxiomsAddition(int)
       }
       if (sigArithmetic.containsRat()) {
-        //println("RAT")
         axioms = axioms union getAxiomsAddition(rat)
       }
       if (sigArithmetic.containsReal()) {
-        //println("REAL")
         axioms = axioms union getAxiomsAddition(real)
       }
     }
     if(sigArithmetic.containsOrd()) {
-      //println("ADD AXIOMS FOR ORDERING WITHOUT REWRITING")
       if (sigArithmetic.containsInt()) {
         axioms = axioms union getAxiomsOrdering(int)
       }
@@ -42,7 +37,6 @@ object ArithmeticAxioms {
       }
     }
     if(sigArithmetic.containsMult()) {
-      //println("ADD AXIOMS FOR MULTIPLICATION WITHOUT REWRITING")
       if(sigArithmetic.containsInt()) {
         axioms = axioms union getAxiomsMultiplication(int)
       }
@@ -53,20 +47,26 @@ object ArithmeticAxioms {
         axioms = axioms union getAxiomsMultiplication(real)
       }
     }
+    // add axioms to the set of unprocessed clauses
     Control.addUnprocessed(axioms)
+
+    // alternative: add axioms to the set of unprocessed clauses
     /*
     for (axiom <- axioms) {
       state.addProcessed(axiom)
     }*/
   }
 
+  // function to create a number object in Leo-III with a given type and a given number
   final def mkNumberOfType(ty: Type, number: Int): Term = {
     if (ty == int) mkInteger(number)
     else if (ty == rat) mkRational(number,1)
     else mkReal(number,0,0)
   }
 
+  // define axioms for addition
   final def getAxiomsAddition(ty: Type)(implicit sig: Signature): Set[AnnotatedClause] = {
+    // set for the axioms that will be added
     var axioms: Set[AnnotatedClause] = Set.empty
     val vargen = freshVarGenFromBlank
     val x = vargen(ty)
@@ -101,7 +101,6 @@ object ArithmeticAxioms {
     // axiom: -(x + y) = (-x + -y)
     val innerTermLeft6 = mkTermApp(mkTypeApp(mkAtom(sig("$sum").key),x.ty),Seq(x,y))
     val termLeft6 = mkTermApp(mkTypeApp(mkAtom(HOLUnaryMinus.key), innerTermLeft6.ty), Seq(innerTermLeft6))
-    // wirklich x.ty im ganzen Term?
     val termRight6 = mkTermApp(mkTypeApp(mkAtom(sig("$sum").key), x.ty), Seq(mkTermApp(mkTypeApp(mkAtom(HOLUnaryMinus.key), x.ty), Seq(x)),mkTermApp(mkTypeApp(mkAtom(HOLUnaryMinus.key),y.ty), Seq(y))))
     val newLit6 = mkLit(termLeft6,termRight6,true)
     axioms += AnnotatedClause(Clause(newLit6), Role_Axiom, FromSystem("introduced_theory",Seq.empty),ClauseAnnotation.PropNoProp)
@@ -109,7 +108,9 @@ object ArithmeticAxioms {
     axioms
   }
 
+  // define axioms for ordering
   final def getAxiomsOrdering(ty: Type)(implicit sig:Signature): Set[AnnotatedClause] = {
+    // set for the axioms that will be added
     var axioms: Set[AnnotatedClause] = Set.empty
     val vargen = freshVarGenFromBlank
     val x = vargen(ty)
@@ -149,7 +150,7 @@ object ArithmeticAxioms {
     val term5 = mkTermApp(mkAtom(|||.key), Seq(mkTermApp(mkAtom(|||.key), Seq(termLeft3, termMiddle5)), termRight5))
     val newLit5 = mkLit(term5, true)
     axioms += AnnotatedClause(Clause(newLit5), Role_Axiom, FromSystem("introduced_theory",Seq.empty), ClauseAnnotation.PropNoProp)
-    // axiom: x < y | y < x + 1 (ONLY INTS?????)
+    // axiom: x < y | y < x + 1 (ONLY INTEGER)
     // first term already existing
     if (ty == int) {
       val innerTermRight6 = mkTermApp(mkTypeApp(mkAtom(sig("$sum").key), x.ty), Seq(x, mkNumberOfType(ty, 1)))
@@ -162,7 +163,9 @@ object ArithmeticAxioms {
     axioms
   }
 
+  // define axioms for multiplication
   final def getAxiomsMultiplication(ty: Type)(implicit sig:Signature): Set[AnnotatedClause] = {
+    // set for axioms that will be added
     var axioms: Set[AnnotatedClause] = Set.empty
     val vargen = freshVarGenFromBlank
     val x = vargen(ty)
@@ -194,8 +197,8 @@ object ArithmeticAxioms {
     val termRight5 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$product").key), x.ty) ,Seq(x,innerTermRight5))
     val newLit5 = mkLit(termLeft5, termRight5, true)
     axioms += AnnotatedClause(Clause(newLit5), Role_Axiom, FromSystem("introduced_theory",Seq.empty),ClauseAnnotation.PropNoProp)
-    // x = 0 | (y * x) / x = y (ONLY REALS!!!!)
-    // DIVISION??????
+    // x = 0 | (y * x) / x = y (ONLY REALS)
+    // DIVISION
     if (ty == real) {
       val termLeft6 = ===(x, mkNumberOfType(ty,0))
       val innerTermLeft6 = mkTermApp(mkTypeApp(mkAtom(sig.apply("$product").key), x.ty) ,Seq(x,y))
