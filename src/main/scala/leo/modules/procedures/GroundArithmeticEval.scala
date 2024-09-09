@@ -125,10 +125,11 @@ object GroundArithmeticEval {
       case _ => term
     }
   }
-  // type for handeling strings of reals
+
+  // type for handling calculations of strings to ensure the right form of normalization
   type RealString = (String, String, Int)
-  // functions for normalizing reals
-  // normalize so that the whole part is not just big zero and the decimal part does not begin with zeros
+  // functions for normalizing reals: takes a real string as input, normalizes it out outputs the corresponding Real
+  // normalize so that the whole part is not big zero and the decimal part has no leading zeros
   final def normalizeRealString(n: RealString): Real = {
     var (wholePart, decimalPlaces, exponent) = n
     if (wholePart.isEmpty) {
@@ -143,7 +144,7 @@ object GroundArithmeticEval {
     // whole part bigger than zero -> check decimal places
     if (BigInt(wholePart) == bigZero) {
       if (leadingZerosLength == decimalPlaces.length) {
-        // everything is zero (is this possible?) but just to be safe
+        // everything is zero
         return (bigZero, bigZero, bigZero)
       } else {
         // change to new exponent
@@ -158,7 +159,7 @@ object GroundArithmeticEval {
     if (leadingZerosLength == decimalPlaces.length) {
       (BigInt(wholePart), bigZero, BigInt(exponent))
     } else if (leadingZerosLength == 0) {
-      // no leading zeros, everything's fine
+      // no leading zeros
       (BigInt(wholePart), BigInt(decimalPlaces), BigInt(exponent))
     } else {
       // eliminate zeros and push the decimal places to the whole part, adjust the exponent
@@ -166,7 +167,7 @@ object GroundArithmeticEval {
       (BigInt(nNew._1),BigInt(nNew._2), BigInt(nNew._3))
     }
   }
-  // takes a real number and a difference and makes the exponent bigger of the amount of the difference
+  // takes a real number and adjusts it to a new given exponent
   // assumes, that the new exponent is smaller than the old one
   final def normalizeRealToGivenExponent(n: RealString, newExponent: Int): RealString = {
     val (wholePart, decimalPlaces, exponent) = n
@@ -197,7 +198,7 @@ object GroundArithmeticEval {
       (newWholeWithoutLeadingZeros, "0", newExponent)
     }
   }
-  // normalize to reals to the same exponent, it will work with zeros, because they are all strings
+  // normalize two reals to the same exponent
   final def normalizeRealsToSameExponent(n1: Real, n2: Real): (RealString, RealString) = {
     val n1String = (n1._1.toString, n1._2.toString, n1._3.toInt)
     val n2String = (n2._1.toString, n2._2.toString, n2._3.toInt)
@@ -214,7 +215,7 @@ object GroundArithmeticEval {
       (newN1, n2String)
     }
   }
-  // function to check whether two reals are equal
+  // checks whether two reals are equal
   final def equalReal(n1: Real, n2: Real): Boolean = {
     val (newN1, newN2) = normalizeRealsToSameExponent(n1,n2)
     // get the numbers
@@ -239,6 +240,7 @@ object GroundArithmeticEval {
     val (num2, denom2) = n2
     num1*denom2 < num2*denom1
   }
+  // checks whether one real is less-or-equal to another one
   private[this] final def evalLessReal(n1: Real, n2: Real): Boolean = { // normalize reals to the same exponent
     val (newN1, newN2) = normalizeRealsToSameExponent(n1, n2)
     // get the numbers
@@ -270,6 +272,7 @@ object GroundArithmeticEval {
     // a/b + c/d =  a*d/b*d + c*b / d*b
     normalizeRat(num1*denom2 + num2*denom1, denom1 * denom2)
   }
+  // addition of two reals
   private[this] final def sumReal(n1: Real, n2: Real): Real = {
     val (newN1, newN2) = normalizeRealsToSameExponent(n1,n2)
     var (wholePart1, decimalPlaces1, exponent1) = newN1
@@ -277,7 +280,7 @@ object GroundArithmeticEval {
     val decimalLength1 = decimalPlaces1.length
     val decimalLength2 = decimalPlaces2.length
     // calculate the whole part out of the other ones
-    var newWohlePart = BigInt(wholePart1) + BigInt(wholePart2)
+    var newWholePart = BigInt(wholePart1) + BigInt(wholePart2)
     // calculate the decimal part and then adjust the whole part
     // check whether the numbers are negative
     val firstNegative = wholePart1.startsWith("-")
@@ -296,26 +299,26 @@ object GroundArithmeticEval {
         // adjust whole part
         newDecimalPlaces = newDecimalPlaces.takeRight(decimalLength1)
         if(!firstNegative) {
-          newWohlePart += 1
+          newWholePart += 1
         } else {
-          newWohlePart -= 1
+          newWholePart -= 1
         }
-        normalizeRealString((newWohlePart.toString, newDecimalPlaces, exponent1))
+        normalizeRealString((newWholePart.toString, newDecimalPlaces, exponent1))
       } else {
-        normalizeRealString((newWohlePart.toString, newDecimalPlaces, exponent1))
+        normalizeRealString((newWholePart.toString, newDecimalPlaces, exponent1))
       }
     } else if (!firstNegative && secondNegative) {
       val newDecimalPlaces = BigInt(decimalPlaces1) - BigInt(decimalPlaces2)
       if (newDecimalPlaces < bigZero) {
-        newWohlePart -= 1
+        newWholePart -= 1
       }
-      normalizeRealString((newWohlePart.toString, newDecimalPlaces.toString.filter(_.isDigit), exponent1))
+      normalizeRealString((newWholePart.toString, newDecimalPlaces.toString.filter(_.isDigit), exponent1))
     } else {
       val newDecimalPlaces = BigInt(decimalPlaces2) - BigInt(decimalPlaces1)
       if (newDecimalPlaces < bigZero) {
-        newWohlePart -= 1
+        newWholePart -= 1
       }
-      normalizeRealString((newWohlePart.toString, newDecimalPlaces.toString.filter(_.isDigit), exponent1))
+      normalizeRealString((newWholePart.toString, newDecimalPlaces.toString.filter(_.isDigit), exponent1))
     }
   }
 
@@ -330,6 +333,7 @@ object GroundArithmeticEval {
     // a/b * c/d =  a*c/b*d
     normalizeRat(num1*num2, denom1*denom2)
   }
+  // product of two reals
   private[this] final def prodReal(n1: Real, n2: Real): Real = {
     val (newN1, newN2) = normalizeRealsToSameExponent(n1, n2)
     val (wholePart1, decimalPlaces1, exponent1) = newN1
@@ -339,13 +343,9 @@ object GroundArithmeticEval {
     val factor1 = BigInt(wholePart1+decimalPlaces1)
     val factor2 = BigInt(wholePart2+decimalPlaces2)
     val result = (factor1 * factor2).toString
-    // println(result)
     if (result.length > (decimalLength1+decimalLength2)) {
-      //println(decimalLength1+decimalLength2)
       val newDecimalPlaces = result.takeRight(decimalLength1+decimalLength2)
-      //println(newDecimalPlaces)
       val newWholePart = result.dropRight(decimalLength1+decimalLength2)
-      //println(newWholePart)
       normalizeRealString((newWholePart,newDecimalPlaces,exponent1+exponent2))
     } else if(result.length == (decimalLength1+decimalLength2)){
       normalizeRealString(("0",result, exponent1+exponent2))
@@ -353,7 +353,7 @@ object GroundArithmeticEval {
       val newWholePart = "0"
       val additionalZeros = "0" * (decimalLength1+decimalLength2-result.length)
       val newDecimalPlaces =  additionalZeros+result
-      normalizeRealString((newWholePart,newWholePart,exponent1+exponent2))
+      normalizeRealString((newWholePart,newDecimalPlaces,exponent1+exponent2))
     }
   }
 
