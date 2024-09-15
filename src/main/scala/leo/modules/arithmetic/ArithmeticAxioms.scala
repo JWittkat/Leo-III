@@ -1,9 +1,10 @@
-package leo.modules.arithmeticWithoutRewriting
-import leo.datastructures.ClauseAnnotation.{FromSystem}
-import leo.datastructures.{AnnotatedClause, Clause, ClauseAnnotation, Role_Axiom, Signature, Term, Type}
-import leo.datastructures.Term.local._
+package leo.modules.arithmetic
+
+import leo.datastructures.ClauseAnnotation.FromSystem
 import leo.datastructures.Literal._
-import leo.modules.HOLSignature.{===, HOLUnaryMinus, Not, i, int, rat, real, |||}
+import leo.datastructures.Term.local._
+import leo.datastructures._
+import leo.modules.HOLSignature._
 import leo.modules.calculus.freshVarGenFromBlank
 import leo.modules.control.Control
 import leo.modules.prover.State

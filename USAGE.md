@@ -225,3 +225,35 @@ Since version 1.6.7 Leo-III also supports reasoning in further non-classical log
 The input syntax uses the same TPTP extensions as for modal logic; the connectives and 
 logic specification parameters vary from logic to logic. The supported logics are documented
 at https://github.com/leoprover/logic-embedding
+
+## Arithmetic
+To handle arithmetic reasoning, theory axioms are added either to
+the set of unprocessed clauses or to the set of processed clause during preprocessing. By default, the axioms are added to the set
+of unprocessed clauses, as this approach has been shown to solve a greater number of problems. 
+The relevant implementation can be found in the `ArithmeticAxioms.scala` file, as demonstrated in the following code segment:
+
+```
+    51  // add axioms to the set of unprocessed clauses
+    52  Control.addUnprocessed(axioms)
+    53
+    54  // alternative: add axioms to the set of unprocessed clauses
+    55  /*
+    56  for (axiom <- axioms) {
+    57    state.addProcessed(axiom)
+    58  }*/
+
+```
+To modify this implementation, allowing the axioms to be added to the set of processed clauses rather than the unprocessed ones,
+the code should be adjusted as follows:
+
+```
+    51  // add axioms to the set of unprocessed clauses
+    52  // Control.addUnprocessed(axioms)
+    53
+    54  // alternative: add axioms to the set of unprocessed clauses
+    55
+    56  for (axiom <- axioms) {
+    57    state.addProcessed(axiom)
+    58  }
+
+```

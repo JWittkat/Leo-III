@@ -3,9 +3,7 @@ package leo.modules.prover
 import leo.{Configuration, Out}
 import leo.datastructures._
 import leo.datastructures.TPTP.AnnotatedFormula
-import leo.modules.HOLSignature.{HOLLess, HOLProduct, HOLQuotient, HOLSum, int, o}
-//import leo.modules.arithmeticWithRewriting.{AxiomsForArithmetic, RewritingArithmetic, SignatureArithmetic}
-import leo.modules.arithmeticWithoutRewriting.{ArithmeticAxioms, CheckingArithmetic, SignatureArithmetic}
+import leo.modules.arithmetic.{ArithmeticAxioms, CheckingArithmetic, SignatureArithmetic}
 import leo.modules.{SZSOutput, SZSResult, myAssert}
 import leo.modules.control.Control
 import leo.modules.input.ProblemStatistics
@@ -61,7 +59,10 @@ object SeqLoop {
 //    result = Control.extPreprocessUnify(result)(state)
     //result = Control.cheapSimpSet(result)
     result = result.filterNot(cw => Clause.trivial(cw.cl))
-    //result = RewritingArithmetic(result)
+
+    ///////////////////////////////////////////////////////////////
+    // Check what arithmetic types and operations are in the result
+    ///////////////////////////////////////////////////////////////
     CheckingArithmetic(result)
     result
   }
@@ -120,7 +121,7 @@ object SeqLoop {
   final def run(input: Seq[AnnotatedClause], startTime: Long)(implicit state: State[AnnotatedClause]): Boolean = {
     try {
       implicit val sig: Signature = state.signature
-      // stuff for saving information about arithmetic operations and types
+      // signature for storing what arithmetic types and operations are present in the problem
       implicit val sigArithmetic: SignatureArithmetic = new SignatureArithmetic
       val timeout0 = state.timeout
       val timeout: Float = if (timeout0 == 0) Float.PositiveInfinity else timeout0.toFloat
@@ -137,11 +138,6 @@ object SeqLoop {
         input
       }
       // Pre-processing
-      //sig.addUninterpreted("$$sum", HOLSum.ty)
-      //sig.addUninterpreted("$$less", HOLLess.ty)
-      //sig.addUninterpreted("$$product", HOLProduct.ty)
-      //sig.addUninterpreted("$$quotient", HOLQuotient.ty)
-
       val toPreprocessIt = toPreprocess.iterator
       Out.trace("## Preprocess BEGIN")
       while (toPreprocessIt.hasNext) {
@@ -155,10 +151,9 @@ object SeqLoop {
         Control.addUnprocessed(result)
         if (toPreprocessIt.hasNext) Out.trace("--------------------")
       }
-      // add axioms
-      //with rewriting
-      //AxiomsForArithmetic()
-      //without rewriting
+      ///////////////////////////////////////////////////////////////
+      // Add the axioms for handling arithmetic
+      ///////////////////////////////////////////////////////////////
       ArithmeticAxioms()
       Out.trace("## Preprocess END")
       /////////////////////////////////////////

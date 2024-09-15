@@ -1,7 +1,8 @@
-package leo.modules.arithmeticWithoutRewriting
-import leo.datastructures.{AnnotatedClause, Clause, Literal, Signature, Term, Type}
-import leo.modules.HOLSignature.{ HOLDifference, HOLGreater, HOLGreaterEq, HOLLess, HOLLessEq, HOLProduct, HOLSum, int, rat, real}
+package leo.modules.arithmetic
+
 import leo.datastructures.Term._
+import leo.datastructures._
+import leo.modules.HOLSignature._
 import leo.modules.prover.State
 
 // Procedure for checking what arithmetic types and operations are present in a given set of clauses
