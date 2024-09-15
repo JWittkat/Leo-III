@@ -51,7 +51,7 @@ object ArithmeticAxioms {
     // add axioms to the set of unprocessed clauses
     Control.addUnprocessed(axioms)
 
-    // alternative: add axioms to the set of unprocessed clauses
+    // alternative: add axioms to the set of processed clauses
     /*
     for (axiom <- axioms) {
       state.addProcessed(axiom)

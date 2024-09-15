@@ -236,7 +236,7 @@ The relevant implementation can be found in the `ArithmeticAxioms.scala` file, a
     51  // add axioms to the set of unprocessed clauses
     52  Control.addUnprocessed(axioms)
     53
-    54  // alternative: add axioms to the set of unprocessed clauses
+    54  // alternative: add axioms to the set of processed clauses
     55  /*
     56  for (axiom <- axioms) {
     57    state.addProcessed(axiom)
@@ -250,7 +250,7 @@ the code should be adjusted as follows:
     51  // add axioms to the set of unprocessed clauses
     52  // Control.addUnprocessed(axioms)
     53
-    54  // alternative: add axioms to the set of unprocessed clauses
+    54  // alternative: add axioms to the set of processed clauses
     55
     56  for (axiom <- axioms) {
     57    state.addProcessed(axiom)
